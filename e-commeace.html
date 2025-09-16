@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TN KART</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f0f3fa;
+      color: #333;
+    }
+
+    header {
+      background: #0078d7;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .products-container { padding: 20px; }
+    .products-title { text-align: center; margin-bottom: 20px; font-size: 26px; color: #0078d7; }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .product {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
+      text-align: center;
+    }
+    .product:hover { transform: translateY(-5px); }
+    .product img { width: 100%; height: 200px; object-fit: cover; }
+    .product-info { padding: 15px; }
+    .product-info h3 { margin: 10px 0; font-size: 18px; }
+    .price { font-size: 16px; font-weight: bold; color: #0078d7; }
+
+    button {
+      background: #0078d7;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover { background: #005fa3; }
+
+    /* Cart */
+    .cart {
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 300px;
+      height: 100%;
+      background: white;
+      box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+    .cart.open { transform: translateX(0); }
+    .cart h2 { margin-top: 0; font-size: 22px; color: #0078d7; }
+    .cart ul { list-style: none; padding: 0; }
+    .cart li { display: flex; justify-content: space-between; margin: 10px 0; align-items: center; gap: 8px; }
+    .cart-total { font-size: 18px; margin-top: 15px; font-weight: bold; }
+    .cart button { width: 100%; margin-top: 15px; }
+
+    .cart-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ff9800;
+      border: none;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      z-index: 1100;
+    }
+    .cart-toggle:hover { background: #e68900; }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+    .modal-backdrop.active { display: flex; }
+    .modal {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 360px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      max-width: calc(100% - 40px);
+    }
+    .modal h3 { margin-top: 0; color: #0078d7; }
+    .modal input, .modal textarea {
+      width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 10px;
+      border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;
+    }
+    .modal .row { display: flex; gap: 8px; }
+    .modal .row > * { flex: 1; }
+
+    .qr-wrap { text-align: center; margin-top: 12px; }
+    .qr-wrap img { width: 200px; height: 200px; object-fit: contain; border-radius: 8px; }
+
+    /* Success screen */
+    .success-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #f0f9f1;
+      z-index: 3000;
+      text-align: center;
+      padding: 50px 20px;
+    }
+    .success-screen h2 { color: #0a7f2d; font-size: 28px; margin-bottom: 15px; }
+    .success-screen p { font-size: 16px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>TN KART</h1>
+    <p>Your Shopping Partner</p>
+  </header>
+
+  <button class="cart-toggle" onclick="toggleCart()">🛒 Cart</button>
+
+  <div class="products-container">
+    <h2 class="products-title">Our Products</h2>
+    <div class="products">
+
+      <div class="product">
+        <img src="earbuds.jpeg" alt="Earbuds">
+        <div class="product-info">
+          <h3>Wireless Earbuds</h3>
+          <p class="price">₹1,999</p>
+          <button onclick="addToCart('Wireless Earbuds', 1999)">Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="product">
+        <img src="hand bag.jpeg" alt="Hand Bag">
+        <div class="product-info">
+          <h3>Leather Hand Bag</h3>
+          <p class="price">₹2,499</p>
+          <button onclick="addToCart('Leather Hand Bag', 2499)">Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="product">
+        <img src="keyboard.jpeg" alt="Keyboard">
+        <div class="product-info">
+          <h3>Mechanical Keyboard</h3>
+          <p class="price">₹3,499</p>
+          <button onclick="addToCart('Mechanical Keyboard', 3499)">Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="product">
+        <img src="laptop.jpeg" alt="Laptop">
+        <div class="product-info">
+          <h3>High-Performance Laptop</h3>
+          <p class="price">₹59,999</p>
+          <button onclick="addToCart('High-Performance Laptop', 59999)">Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="product">
+        <img src="mouse.jpeg" alt="Mouse">
+        <div class="product-info">
+          <h3>Wireless Mouse</h3>
+          <p class="price">₹899</p>
+          <button onclick="addToCart('Wireless Mouse', 899)">Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="product">
+        <img src="saree.jpeg" alt="Saree">
+        <div class="product-info">
+          <h3>Designer Saree</h3>
+          <p class="price">₹3,299</p>
+          <button onclick="addToCart('Designer Saree', 3299)">Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="product">
+        <img src="shoes.jpeg" alt="Shoes">
+        <div class="product-info">
+          <h3>Casual Shoes</h3>
+          <p class="price">₹1,799</p>
+          <button onclick="addToCart('Casual Shoes', 1799)">Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="product">
+        <img src="sound bar.jpeg" alt="Sound Bar">
+        <div class="product-info">
+          <h3>Bluetooth Sound Bar</h3>
+          <p class="price">₹4,999</p>
+          <button onclick="addToCart('Bluetooth Sound Bar', 4999)">Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="product">
+        <img src="travel bag.jpeg" alt="Travel Bag">
+        <div class="product-info">
+          <h3>Travel Bag</h3>
+          <p class="price">₹2,199</p>
+          <button onclick="addToCart('Travel Bag', 2199)">Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="product">
+        <img src="wrist watch.webp" alt="Watch">
+        <div class="product-info">
+          <h3>Classic Wrist Watch</h3>
+          <p class="price">₹2,999</p>
+          <button onclick="addToCart('Classic Wrist Watch', 2999)">Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="product">
+        <img src="Wireles Headphone.jpeg" alt="Wireless Headphone">
+        <div class="product-info">
+          <h3>Over-Ear Wireless Headphone</h3>
+          <p class="price">₹3,999</p>
+          <button onclick="addToCart('Over-Ear Wireless Headphone', 3999)">Add to Cart</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="cart" id="cart">
+    <h2>Your Cart</h2>
+    <ul id="cart-items"></ul>
+    <p class="cart-total">Total: ₹<span id="cart-total">0</span></p>
+    <button onclick="checkout()">Checkout</button>
+  </div>
+
+  <div class="modal-backdrop" id="detailsModal">
+    <div class="modal">
+      <h3>Enter Customer Details</h3>
+      <input type="text" id="cust-name" placeholder="Full name" />
+      <input type="email" id="cust-email" placeholder="Email" />
+      <input type="tel" id="cust-phone" placeholder="Phone number" />
+      <textarea id="cust-address" rows="3" placeholder="Delivery address"></textarea>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button onclick="closeDetailsModal()" style="flex:1; background:#ccc; color:#222;">Cancel</button>
+        <button onclick="submitCustomerDetails()" style="flex:1;">Proceed to Payment</button>
+      </div>
+      <p class="order-summary" id="details-error" style="color:crimson; display:none; margin-top:8px;"></p>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="paymentModal">
+    <div class="modal">
+      <h3>Payment Options</h3>
+      <p>Total Amount: <strong>₹<span id="payment-total">0</span></strong></p>
+
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button onclick="payCOD()" style="flex:1;">Cash on Delivery (COD)</button>
+        <button onclick="toggleQR()" style="flex:1; background:#22a; color:#fff;">Pay via UPI</button>
+      </div>
+
+      <div class="qr-wrap" id="qrSection" style="display:none;">
+        <p>Scan &amp; Pay using UPI (ID: <strong>8248045952@fam</strong>)</p>
+        <!-- Your uploaded QR image -->
+        <img id="upi-qr" src="QR.jpg" alt="UPI QR">
+        <div style="margin-top:10px;">
+          <button onclick="confirmUpiPaid()">I Have Paid</button>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top:14px;">
+        <button onclick="closePaymentModal()" style="flex:1; background:#ccc; color:#222;">Back</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="success-screen" id="successScreen">
+    <h2>✅ Order Successfully Placed!</h2>
+    <p>Thank you for shopping with <strong>TN KART</strong>. Your order is on the way!</p>
+  </div>
+
+  <script>
+    let cart = [];
+
+    function addToCart(product, price) {
+      cart.push({ product, price });
+      renderCart();
+    }
+    function renderCart() {
+      const cartItems = document.getElementById("cart-items");
+      const cartTotal = document.getElementById("cart-total");
+      cartItems.innerHTML = "";
+      let total = 0;
+      cart.forEach((item, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `${item.product} - ₹${item.price} <button onclick="removeFromCart(${index})">❌</button>`;
+        cartItems.appendChild(li);
+        total += item.price;
+      });
+      cartTotal.textContent = total;
+    }
+    function removeFromCart(index) { cart.splice(index, 1); renderCart(); }
+    function toggleCart() { document.getElementById("cart").classList.toggle("open"); }
+
+    function checkout() {
+      if (cart.length === 0) { alert("Your cart is empty!"); return; }
+      document.getElementById('details-error').style.display = 'none';
+      document.getElementById('detailsModal').classList.add('active');
+    }
+    function closeDetailsModal() { document.getElementById('detailsModal').classList.remove('active'); }
+
+    let customer = null;
+    function submitCustomerDetails() {
+      const name = document.getElementById('cust-name').value.trim();
+      const email = document.getElementById('cust-email').value.trim();
+      const phone = document.getElementById('cust-phone').value.trim();
+      const address = document.getElementById('cust-address').value.trim();
+      const err = document.getElementById('details-error');
+
+      if (!name || !phone || !address) {
+        err.textContent = "Please fill name, phone and address.";
+        err.style.display = 'block';
+        return;
+      }
+      customer = { name, email, phone, address };
+      document.getElementById('detailsModal').classList.remove('active');
+      openPaymentModal();
+    }
+    function openPaymentModal() {
+      const total = cart.reduce((s, it) => s + it.price, 0);
+      document.getElementById('payment-total').textContent = total;
+      document.getElementById('qrSection').style.display = 'none';
+      document.getElementById('paymentModal').classList.add('active');
+    }
+    function closePaymentModal() { document.getElementById('paymentModal').classList.remove('active'); }
+    function toggleQR() {
+      const q = document.getElementById('qrSection');
+      q.style.display = q.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function payCOD() { finalizeOrder('COD'); }
+    function confirmUpiPaid() { finalizeOrder('UPI'); }
+
+    function finalizeOrder(method) {
+      document.getElementById('paymentModal').classList.remove('active');
+      document.getElementById('successScreen').style.display = 'block';
+      console.log('Order placed:', { customer, method, items: cart.slice(), total: cart.reduce((s, i) => s + i.price, 0), });
+      cart = [];
+      renderCart();
+    }
+  </script>
+</body>
+</html>
